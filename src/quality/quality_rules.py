@@ -88,9 +88,7 @@ def add_quality_validation_columns(df: DataFrame) -> DataFrame:
              .when(F.col("pickup_datetime").isNull(), F.lit("pickup datetime is null"))
              .when(F.col("dropoff_datetime").isNull(), F.lit("dropoff datetime is null"))
              .when(F.col("passenger_count") <= 0, F.lit("passenger_count must be greater than zero"))
-             .when(F.col("passenger_count") > 6, F.lit("passenger_count greater than expected taxi capacity"))
              .when(F.col("total_amount") < 0, F.lit("total_amount must be greater than or equal to zero"))
-             .when(F.col("total_amount") > 1000, F.lit("total_amount greater than expected threshold"))
              .when(
                  F.col("dropoff_datetime") < F.col("pickup_datetime"),
                  F.lit("dropoff datetime before pickup datetime")
