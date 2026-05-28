@@ -13,8 +13,7 @@ def validate_required_columns(df: DataFrame) -> None:
     """
     Valida se as colunas obrigatórias existem no DataFrame.
 
-    Como o dataset contém Yellow Taxi e Green Taxi, as colunas de data/hora
-    podem vir com prefixos diferentes:
+    O dataset contém Yellow Taxi e Green Taxi.
 
     Yellow:
     - tpep_pickup_datetime
@@ -51,56 +50,22 @@ def validate_required_columns(df: DataFrame) -> None:
         )
 
 
-def column_or_null(df: DataFrame, column_name: str):
-    """
-    Retorna a coluna se ela existir no DataFrame.
-    Caso contrário, retorna nulo.
-    """
-    if column_name in df.columns:
-        return F.col(column_name)
-
-    return F.lit(None)
-
-
 def standardize_taxi_data(df: DataFrame) -> DataFrame:
     """
-    Padroniza os dados de Yellow Taxi e Green Taxi para um modelo único.
-
-    Yellow Taxi usa:
-    - tpep_pickup_datetime
-    - tpep_dropoff_datetime
-
-    Green Taxi usa:
-    - lpep_pickup_datetime
-    - lpep_dropoff_datetime
-
-    A camada Silver usa nomes padronizados:
-    - pickup_datetime
-    - dropoff_datetime
+    Seleciona as colunas padronizadas da Bronze e cria colunas auxiliares.
     """
 
     return (
         df
-        .withColumn(
-            "pickup_datetime",
-            F.coalesce(
-                column_or_null(df, "tpep_pickup_datetime"),
-                column_or_null(df, "lpep_pickup_datetime")
-            ).cast(TimestampType())
-        )
-        .withColumn(
-            "dropoff_datetime",
-            F.coalesce(
-                column_or_null(df, "tpep_dropoff_datetime"),
-                column_or_null(df, "lpep_dropoff_datetime")
-            ).cast(TimestampType())
-        )
         .select(
             F.col("VendorID").cast(IntegerType()).alias("VendorID"),
             F.col("passenger_count").cast(DoubleType()).alias("passenger_count"),
             F.col("total_amount").cast(DoubleType()).alias("total_amount"),
-            F.col("pickup_datetime"),
-            F.col("dropoff_datetime")
+            F.col("pickup_datetime").cast(TimestampType()).alias("pickup_datetime"),
+            F.col("dropoff_datetime").cast(TimestampType()).alias("dropoff_datetime"),
+            F.col("taxi_type"),
+            F.col("source_file"),
+            F.col("ingestion_timestamp")
         )
         .withColumn("pickup_date", F.to_date("pickup_datetime"))
         .withColumn("pickup_hour", F.hour("pickup_datetime"))
@@ -110,8 +75,7 @@ def standardize_taxi_data(df: DataFrame) -> DataFrame:
 
 def add_quality_validation_columns(df: DataFrame) -> DataFrame:
     """
-    Aplica regras de qualidade e adiciona uma coluna com o motivo da rejeição.
-    Quando rejection_reason for nulo, o registro é considerado válido.
+    Aplica regras de qualidade e adiciona o motivo da rejeição.
     """
 
     return (
