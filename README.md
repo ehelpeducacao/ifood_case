@@ -1,4 +1,4 @@
-# iFood Case Técnico - Data Architect
+# iFood Case Técnico 
 
 ## 1. Objetivo do projeto
 
