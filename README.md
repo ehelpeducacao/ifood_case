@@ -563,7 +563,7 @@ ifood_case.gold_hourly_metrics
 
 Cria a tabela Gold diária.
 
-Grão da tabela:
+Granularidade da tabela:
 
 ```text
 pickup_date
@@ -588,7 +588,7 @@ created_at
 
 Cria a tabela Gold horária.
 
-Grão da tabela:
+Granularidade da tabela:
 
 ```text
 pickup_date
