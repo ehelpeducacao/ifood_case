@@ -124,14 +124,12 @@ ifood-case/
 ├── src/
 │   ├── config/
 │   │   └── settings.py
-│   │
 │   └── quality/
 │       └── quality_rules.py
-│
-├── notebooks/
 │   ├── ingestion_to_land
 │   ├── land_to_silver
 │   ├── silver_to_gold
+├── analysis/
 │   ├── 01_analysis_avg_total_amount_yellow_taxi
 │   └── 02_analysis_avg_passenger_by_hour_may
 │   └── 03_analysis_quality_quarentine
