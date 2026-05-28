@@ -662,7 +662,7 @@ As regras aplicadas antes da criação da Silver são:
 | `pickup_datetime` não pode ser nulo | Campo necessário para análise temporal |
 | `dropoff_datetime` não pode ser nulo | Campo necessário para consistência temporal |
 | `passenger_count > 0` | Evita corridas sem passageiros |
-| | `total_amount >= 0` | Evita distorção financeira |
+| `total_amount >= 0` | Evita distorção financeira |
 | `total_amount <= 100000` | Evita outliers extremos |
 | `dropoff_datetime >= pickup_datetime` | Garante consistência da corrida |
 | `pickup_month` entre `2023-01` e `2023-05` | Garante aderência ao escopo do case |
