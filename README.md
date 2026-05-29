@@ -150,10 +150,10 @@ Antes de executar o projeto, é necessário ter:
 ```text
 Criado, e usado apenas para gravar uma copia da landing-zone.
 Com o databricks free edition temos o seguinte cenario:
-Você não consegue configurar cluster livremente,
-spark.conf.set para credenciais de storage pode ser bloqueado,
-dbutils.fs.mount não fica disponível,
-interface de credenciais/external locations pode não expor
+- Você não consegue configurar cluster livremente,
+- spark.conf.set para credenciais de storage pode ser bloqueado,
+- dbutils.fs.mount não fica disponível,
+- interface de credenciais/external locations pode não expor
 Azure ADLS como em um workspace Azure Databricks normal;
 ```
 - SAS Token gerado para acesso ao container;
