@@ -252,7 +252,7 @@ dbutils.secrets.get(
 
 ## 10. Instalação de dependências
 
-No notebook `pipeline`, execute a primeira célula:
+No notebook `ingestion_to_land`, execute a primeira célula:
 
 ```python
 %pip install azure-storage-blob
