@@ -70,15 +70,9 @@ GOLD_HOURLY_METRICS_TABLE = f"{DATABASE_NAME}.gold_hourly_metrics"
 
 SOURCE_BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data"
 
-SOURCE_FILES = [
-    "yellow_tripdata_2023-01.parquet",
-    "yellow_tripdata_2023-02.parquet",
-    "yellow_tripdata_2023-03.parquet",
-    "yellow_tripdata_2023-04.parquet",
-    "yellow_tripdata_2023-05.parquet",
-    "green_tripdata_2023-01.parquet",
-    "green_tripdata_2023-02.parquet",
-    "green_tripdata_2023-03.parquet",
-    "green_tripdata_2023-04.parquet",
-    "green_tripdata_2023-05.parquet"
+TAXI_TYPES = [
+    "yellow",
+    "green",
+    "fhv", 
+    "fhvhv"
 ]
