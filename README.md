@@ -146,13 +146,16 @@ Antes de executar o projeto, é necessário ter:
 
 - conta no Databricks Community Edition;
 - repositório GitHub com os arquivos do projeto;
-- Azure Storage Account criado (motivo abaixo);
-- --com o databricks free edition temos o seguinte cenario:
-- ---Você não consegue configurar cluster livremente,
-- ---spark.conf.set para credenciais de storage pode ser bloqueado,
-- ---dbutils.fs.mount não fica disponível,
-- ---A interface de credenciais/external locations pode não expor Azure ADLS como em um workspace Azure Databricks normal;
-- container criado no Azure Storage;
+- Azure Storage Account econtainer criado no Azure Storage;
+```text
+Criado, e usado apenas para gravar uma copia da landing-zone.
+Com o databricks free edition temos o seguinte cenario:
+Você não consegue configurar cluster livremente,
+spark.conf.set para credenciais de storage pode ser bloqueado,
+dbutils.fs.mount não fica disponível,
+interface de credenciais/external locations pode não expor
+Azure ADLS como em um workspace Azure Databricks normal;
+```
 - SAS Token gerado para acesso ao container;
 - Secret Scope criado no Databricks;
 - Secret salvo no Databricks com o SAS Token.
