@@ -69,10 +69,3 @@ GOLD_HOURLY_METRICS_TABLE = f"{DATABASE_NAME}.gold_hourly_metrics"
 # ============================================================
 
 SOURCE_BASE_URL = "https://d37ci6vzurychx.cloudfront.net/trip-data"
-
-TAXI_TYPES = [
-    "yellow",
-    "green",
-    "fhv", 
-    "fhvhv"
-]
