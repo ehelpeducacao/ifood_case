@@ -146,7 +146,12 @@ Antes de executar o projeto, é necessário ter:
 
 - conta no Databricks Community Edition;
 - repositório GitHub com os arquivos do projeto;
-- Azure Storage Account criado;
+- Azure Storage Account criado (motivo abaixo);
+- --com o databricks free edition temos o seguinte cenario:
+- ---Você não consegue configurar cluster livremente,
+- ---spark.conf.set para credenciais de storage pode ser bloqueado,
+- ---dbutils.fs.mount não fica disponível,
+- ---A interface de credenciais/external locations pode não expor Azure ADLS como em um workspace Azure Databricks normal;
 - container criado no Azure Storage;
 - SAS Token gerado para acesso ao container;
 - Secret Scope criado no Databricks;
@@ -259,8 +264,9 @@ Essa biblioteca é usada para enviar os arquivos originais da Landing para o Azu
 Execute os notebooks nesta ordem:
 
 ```text
-1. land_to_silver
-2. silver_to_gold
+1. ingestion_to_land
+2. land_to_silver
+3. silver_to_gold
 3. 01_analysis_avg_total_amount_yellow_taxi
 4. 02_analysis_avg_passenger_by_hour_may
 4. 03_analysis_quality_quarentine
@@ -268,9 +274,35 @@ Execute os notebooks nesta ordem:
 
 ---
 
-## 12. Execução do pipeline principal
+## 12. Execução
+O notebook de ingestao para landing é:
 
-O notebook principal é:
+```text
+ingestion_to_land
+```
+
+Ele executa as seguintes etapas:
+
+```text
+1. Geração da lista de meses com base no período configurado
+2. Geração automática dos nomes dos arquivos da NYC TLC
+3. Recuperação do SAS Token armazenado no Databricks Secret Scope
+4. Criação do client de conexão com o Azure Blob Storage
+5. Criação da pasta local temporária de landing
+6. Download dos arquivos da NYC TLC para a landing local
+7. Verificação se o arquivo já existe no Azure Blob Storage
+8. Upload dos arquivos originais para a Landing Zone no Azure Blob Storage
+9. Finalização do processo de ingestão para landing
+```
+
+Para executar, rode o notebook `ingestion_to_land` até o final.
+
+A última célula executa:
+
+```python
+ingestion_to_land()
+```
+O notebook que envia dados para bronze e silver é:
 
 ```text
 land_to_silver
@@ -281,12 +313,10 @@ Ele executa as seguintes etapas:
 ```text
 1. Criação do database
 2. Remoção de tabelas antigas
-3. Download dos arquivos da NYC TLC
-4. Upload dos arquivos originais para Azure Blob Storage
-5. Criação da camada Bronze
-6. Criação da camada Silver
-7. Criação da camada Quarantine
-8. Criação dos relatórios de qualidade
+3. Criação da camada Bronze
+4. Criação da camada Silver
+5. Criação da camada Quarantine
+6. Criação dos relatórios de qualidade
 ```
 
 Para executar, rode o notebook `land_to_silver` até o final.
@@ -294,14 +324,14 @@ Para executar, rode o notebook `land_to_silver` até o final.
 A última célula executa:
 
 ```python
-run_pipeline()
+land_to_silver()
 ```
 
 ---
 
 ## 13. Execução da camada Gold
 
-Após executar o pipeline principal, execute o notebook:
+Após executar o pipeline de ingestao e cargas das camadas bronze e silver, execute o notebook:
 
 ```text
 silver_to_gold
@@ -319,7 +349,7 @@ ifood_case.gold_hourly_metrics
 A última célula executa:
 
 ```python
-run_gold_pipeline()
+silver_to_gold()
 ```
 
 ---
@@ -372,7 +402,6 @@ Responsável por armazenar:
 - nome da Secret Key;
 - caminhos locais;
 - nomes das tabelas gerenciadas;
-- lista de arquivos de origem;
 - contrato mínimo de colunas obrigatórias.
 
 Principais configurações:
@@ -383,23 +412,6 @@ CONTAINER_NAME = "datalakedev"
 
 SECRET_SCOPE = "scope-access-sta"
 SECRET_KEY = "azure-storage-sas-token"
-```
-
-Também define os arquivos que serão baixados:
-
-```python
-SOURCE_FILES = [
-    "yellow_tripdata_2023-01.parquet",
-    "yellow_tripdata_2023-02.parquet",
-    "yellow_tripdata_2023-03.parquet",
-    "yellow_tripdata_2023-04.parquet",
-    "yellow_tripdata_2023-05.parquet",
-    "green_tripdata_2023-01.parquet",
-    "green_tripdata_2023-02.parquet",
-    "green_tripdata_2023-03.parquet",
-    "green_tripdata_2023-04.parquet",
-    "green_tripdata_2023-05.parquet"
-]
 ```
 
 ### 15.2 `src/quality/quality_rules.py`
@@ -458,27 +470,7 @@ Retorna apenas registros válidos para a Silver.
 
 Retorna os registros inválidos para a Quarantine.
 
-### 15.3 `ingestion_to_land`
-
-Notebook responsável pela ingestão inicial.
-
-Ele executa três ações principais:
-
-```text
-1. Baixa os arquivos Parquet da NYC TLC
-2. Salva os arquivos localmente
-3. Envia os arquivos originais para o Azure Blob Storage
-```
-
-A função principal é:
-
-```python
-ingestion_to_landing()
-```
-
-Esse notebook não é executado isoladamente no fluxo principal. Ele é carregado dentro do notebook `land_to_silver`.
-
-### 15.4 `land_to_silver`
+### 15.3 `land_to_silver`
 
 Notebook principal do projeto.
 
@@ -546,7 +538,7 @@ Essas tabelas ajudam a auditar o resultado do pipeline.
 
 Orquestra a execução completa do pipeline principal.
 
-### 15.5 `notebooks/silver_to_gold`
+### 15.4 `notebooks/silver_to_gold`
 
 Notebook responsável por gerar a camada Gold.
 
@@ -614,7 +606,7 @@ created_at
 
 Executa a geração completa da Gold.
 
-### 15.6 `01_analysis_avg_total_amount_yellow_taxi`
+### 15.5 `01_analysis_avg_total_amount_yellow_taxi`
 
 Notebook analítico para responder à primeira pergunta do desafio.
 
@@ -632,7 +624,7 @@ SUM(sum_total_amount) / SUM(total_trips)
 
 Essa abordagem evita erro de média de médias.
 
-### 15.7 `02_analysis_avg_passenger_by_hour_may`
+### 15.6 `02_analysis_avg_passenger_by_hour_may`
 
 Notebook analítico para responder à segunda pergunta do desafio.
 
